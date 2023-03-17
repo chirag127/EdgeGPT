@@ -252,9 +252,8 @@ class ChatHub:
         """
         Ask a question to the bot
         """
-        if self.wss:
-            if not self.wss.closed:
-                await self.wss.close()
+        if self.wss and not self.wss.closed:
+            await self.wss.close()
         # Check if websocket is closed
         self.wss = await websockets.connect(
             "wss://sydney.bing.com/sydney/ChatHub",
@@ -402,8 +401,8 @@ async def main():
                 ][1]["adaptiveCards"][0]["body"][0]["text"],
             )
         else:
+            wrote = 0
             if args.rich:
-                wrote = 0
                 md = Markdown("")
                 with Live(md, auto_refresh=False) as live:
                     async for final, response in bot.ask_stream(
@@ -418,7 +417,6 @@ async def main():
                             md = Markdown(response)
                             live.update(md, refresh=True)
             else:
-                wrote = 0
                 async for final, response in bot.ask_stream(
                     prompt=question,
                     conversation_style=args.style,
